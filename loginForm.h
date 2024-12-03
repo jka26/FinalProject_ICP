@@ -1,6 +1,7 @@
 #pragma once
 
 #include "signup.h"
+#include "MainMDIForm.h"
 // Forward declare SignUpForm to resolve circular dependency
 namespace FinalProject_ICP {
     ref class SignUpForm;
@@ -241,9 +242,8 @@ namespace FinalProject_ICP {
 
         void btnLogin_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            if (txtEmail->Text == "Email" || txtPassword->Text == "Password" ||
-                String::IsNullOrWhiteSpace(txtEmail->Text) || String::IsNullOrWhiteSpace(txtPassword->Text)) {
-                MessageBox::Show("Please enter both email and password.",
+            if (txtEmail->Text == "Email" || String::IsNullOrWhiteSpace(txtEmail->Text)) {
+                MessageBox::Show("Please enter your email address.",
                     "Login Error", MessageBoxButtons::OK, MessageBoxIcon::Warning);
                 return;
             }
@@ -253,7 +253,7 @@ namespace FinalProject_ICP {
                     sqlConnection->Open();
                 }
 
-                String^ query = "SELECT user_id, role, password FROM users WHERE email = @email";
+                String^ query = "SELECT user_id, role FROM users WHERE email = @email";
 
                 MySqlCommand^ cmd = gcnew MySqlCommand(query, sqlConnection);
                 cmd->Parameters->AddWithValue("@email", txtEmail->Text);
@@ -261,26 +261,24 @@ namespace FinalProject_ICP {
                 MySqlDataReader^ reader = cmd->ExecuteReader();
 
                 if (reader->Read()) {
-                    String^ storedPassword = reader["password"]->ToString();
+                    String^ userID = reader["user_id"]->ToString();
+                    String^ userRole = reader["role"]->ToString();
 
-                    if (storedPassword == txtPassword->Text) { // In production, use proper password verification
-                        this->UserID = reader["user_id"]->ToString();
-                        this->UserRole = reader["role"]->ToString();
+                    this->DialogResult = System::Windows::Forms::DialogResult::OK;
+                    MessageBox::Show("Welcome back!", "Login Successful",
+                        MessageBoxButtons::OK, MessageBoxIcon::Information);
 
-                        this->DialogResult = System::Windows::Forms::DialogResult::OK;
-                        MessageBox::Show("Welcome back!", "Login Successful",
-                            MessageBoxButtons::OK, MessageBoxIcon::Information);
+                    // Hide the login form
+                    this->Hide();
 
-                        this->Hide();
-                        // Main form navigation would go here
-                    }
-                    else {
-                        MessageBox::Show("Invalid password.",
-                            "Login Failed", MessageBoxButtons::OK, MessageBoxIcon::Error);
-                    }
+                    // Create and show the MDI form
+                    UniversityManagementSystem::MainMDIForm^ mdiForm =
+                        gcnew UniversityManagementSystem::MainMDIForm(userID, userRole);
+                    mdiForm->FormClosed += gcnew FormClosedEventHandler(this, &LoginForm::OnMDIFormClosed);
+                    mdiForm->Show();
                 }
                 else {
-                    MessageBox::Show("Email not found.",
+                    MessageBox::Show("Invalid email address.",
                         "Login Failed", MessageBoxButtons::OK, MessageBoxIcon::Error);
                 }
             }
@@ -293,6 +291,12 @@ namespace FinalProject_ICP {
                     sqlConnection->Close();
                 }
             }
+        }
+
+        // Handle MDI form closure
+        void OnMDIFormClosed(Object^ sender, FormClosedEventArgs^ e)
+        {
+            Application::Exit();
         }
 
         void btnCancel_Click(System::Object^ sender, System::EventArgs^ e)

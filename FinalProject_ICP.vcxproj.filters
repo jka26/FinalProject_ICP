@@ -21,12 +21,18 @@
     <ClCompile Include="loginForm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MainMDIForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="signup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="loginForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMDIForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

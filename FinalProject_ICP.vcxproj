@@ -124,10 +124,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="loginForm.cpp" />
+    <ClCompile Include="MainMDIForm.cpp" />
     <ClCompile Include="signup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="loginForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="MainMDIForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="signup.h">
